@@ -1,5 +1,5 @@
 from rest_framework import generics
-from .models import Doctor, Patient, Appointment
+from .models import *
 from .serializers import *
 
 # Doctor API
