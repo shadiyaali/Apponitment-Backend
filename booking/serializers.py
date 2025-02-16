@@ -1,37 +1,43 @@
+# serializers.py
 from rest_framework import serializers
 from .models import *
 
-class DoctorSerializer(serializers.ModelSerializer):
+class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Doctor
-        fields = '__all__'
+        model = Employee
+        fields = ['id', 'name', 'department', 'email', 'phone', 'employee_type']
+
+
+class AttendanceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Attendance
+        fields = ['id', 'employee', 'date', 'is_present']
 
 class PatientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Patient
-        fields = '__all__'
-
-
+        fields = ['patient_id', 'name', 'age', 'gender', 'phone', 'email']
+\
 
 class AppointmentSerializer(serializers.ModelSerializer):
-    # Use PrimaryKeyRelatedField for creating appointments
     patient = serializers.PrimaryKeyRelatedField(queryset=Patient.objects.all())
-    doctor = serializers.PrimaryKeyRelatedField(queryset=Doctor.objects.all())
+    doctor = serializers.PrimaryKeyRelatedField(queryset=Employee.objects.filter(employee_type='Doctor'))
 
     class Meta:
         model = Appointment
-        fields = '__all__'
+        fields = ['token_number', 'patient', 'doctor', 'date', 'time', 'status']
 
-    def validate_patient(self, value):
-        if not value:
-            raise serializers.ValidationError("Patient cannot be null.")
-        return value
 
-class AppointmentDetailSerializer(serializers.ModelSerializer):
-    # Use nested serialization for retrieving appointments
+
+
+class AppointmentGetSerializer(serializers.ModelSerializer):
+    # Use the PatientSerializer for the patient field to get full patient details
     patient = PatientSerializer()
-    doctor = DoctorSerializer()
+    
+    # Use the EmployeeSerializer for the doctor field to get full doctor details
+    doctor = EmployeeSerializer()
 
     class Meta:
         model = Appointment
-        fields = '__all__'
+        fields = ['token_number', 'patient', 'doctor', 'date', 'time', 'status']
+

@@ -1,15 +1,41 @@
 from django.db import models
 import random
 
-class Doctor(models.Model):
-    name = models.CharField(max_length=255)
-    specialization = models.CharField(max_length=255)
-    phone = models.CharField(max_length=20,null = True, blank =True)
-    email = models.EmailField(unique=True,null = True, blank =True)
+
+class Employee(models.Model):
+    DOCTOR = 'Doctor'
+    NURSE = 'Nurse'
+
+    EMPLOYEE_TYPES = [
+        (DOCTOR, 'Doctor'),
+        (NURSE, 'Nurse'),
+    ]
+
+    name = models.CharField(max_length=200)
+    department = models.CharField(max_length=100)
+    email = models.EmailField(unique=True)
+    phone = models.CharField(max_length=15)
+    employee_type = models.CharField(
+        max_length=10,
+        choices=EMPLOYEE_TYPES,
+        default=DOCTOR,
+    )
 
     def __str__(self):
-        return self.name
+        return f'{self.name} ({self.get_employee_type_display()})'
 
+
+class Attendance(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    date = models.DateField()
+    is_present = models.BooleanField(default=True)   
+   
+    class Meta:
+        unique_together = ('employee', 'date')   
+
+    def __str__(self):
+        return f'{self.employee.name} - {self.date} - {"Present" if self.is_present else "Absent"}'
+    
 
 
 class Patient(models.Model):
@@ -33,23 +59,23 @@ class Patient(models.Model):
     def __str__(self):
         return f"{self.name} - {self.patient_id}"
 
- 
 
 class Appointment(models.Model):
     STATUS_CHOICES = [
         ('Booked', 'Booked'),
+        ('Pending', 'Pending'),
         ('Checked In', 'Checked In'),
         ('In Progress', 'In Progress'),
         ('Completed', 'Completed'),
         ('Cancelled', 'Cancelled'),
     ]
 
-    token_number = models.PositiveIntegerField(unique=True, editable=False,null=True, blank=True) 
+    token_number = models.PositiveIntegerField(unique=True, editable=False, null=True, blank=True)
     patient = models.ForeignKey('Patient', on_delete=models.CASCADE)
-    doctor = models.ForeignKey('Doctor', on_delete=models.CASCADE)
+    doctor = models.ForeignKey('Employee', on_delete=models.CASCADE, limit_choices_to={'employee_type': 'Doctor'})
     date = models.DateField(null=True, blank=True)
     time = models.TimeField(null=True, blank=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Booked')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
 
     def save(self, *args, **kwargs):
         if not self.token_number:
@@ -57,7 +83,7 @@ class Appointment(models.Model):
             if last_appointment:
                 self.token_number = last_appointment.token_number + 1
             else:
-                self.token_number = 1 
+                self.token_number = 1
         super().save(*args, **kwargs)
 
     def __str__(self):

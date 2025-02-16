@@ -1,16 +1,22 @@
+# urls.py
 from django.urls import path
 from .views import *
 
 urlpatterns = [
-    # Doctor Routes
-    path('doctors/', DoctorListCreateView.as_view(), name='doctor-list'),
-    path('doctors/<int:pk>/', DoctorDetailView.as_view(), name='doctor-detail'),
+    path('employees/', EmployeeListCreate.as_view(), name='employee-list-create'),
+    path('employees/<int:pk>/', EmployeeDetail.as_view(), name='employee-detail'),
 
-    # Patient Routes
-    path('patients/', PatientListCreateView.as_view(), name='patient-list'),
+    path('attendance/', AttendanceListCreate.as_view(), name='attendance-list-create'),
+    path('attendance/<int:pk>/', AttendanceDetail.as_view(), name='attendance-detail'),
+    
+    path('patients/', PatientListCreateView.as_view(), name='patient-list-create'),
     path('patients/<int:pk>/', PatientDetailView.as_view(), name='patient-detail'),
 
-    # Appointment Routes
-    path('appointments/', AppointmentListCreateView.as_view(), name='appointment-list'),
-    path('appointments/<int:pk>/', AppointmentDetailView.as_view(), name='appointment-detail'),
+    path('appointments/', AppointmentListCreate.as_view(), name='appointment-list-create'),  
+    path('appointments/<int:pk>/', AppointmentDetail.as_view(), name='appointment-detail'),   
+
+    path('employee-count-today/', EmployeeCountTodayView.as_view(), name='employee-count-today'),
+    path('appointments-today/', AppointmentTodayView.as_view(), name='appointments-today'),
+    path('appointments-status-count/', AppointmentOddStatusCountView.as_view(), name='appointments-odd-status-count'),
 ]
+

@@ -3,6 +3,7 @@ from .models import *
 
 
  
-admin.site.register(Doctor)
+admin.site.register(Employee)
+admin.site.register(Attendance)
 admin.site.register(Patient)
 admin.site.register(Appointment)
