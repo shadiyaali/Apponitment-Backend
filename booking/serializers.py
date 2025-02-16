@@ -36,7 +36,6 @@ class AppointmentSerializer(serializers.ModelSerializer):
  
 
 class AppointmentGetSerializer(serializers.ModelSerializer):
-   
     patient = serializers.PrimaryKeyRelatedField(queryset=Patient.objects.all(), required=False)
     doctor = serializers.PrimaryKeyRelatedField(queryset=Employee.objects.filter(employee_type='Doctor'), required=False)
 
