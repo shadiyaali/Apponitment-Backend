@@ -11,10 +11,10 @@ class Employee(models.Model):
         (NURSE, 'Nurse'),
     ]
 
-    name = models.CharField(max_length=200)
-    department = models.CharField(max_length=100)
-    email = models.EmailField(unique=True)
-    phone = models.CharField(max_length=15)
+    name = models.CharField(max_length=200,null=True, blank=True)
+    department = models.CharField(max_length=100,null=True, blank=True)
+    email = models.EmailField(unique=True,null=True, blank=True)
+    phone = models.CharField(max_length=15,null=True, blank=True)
     employee_type = models.CharField(
         max_length=10,
         choices=EMPLOYEE_TYPES,
