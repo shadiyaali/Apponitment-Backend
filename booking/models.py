@@ -39,8 +39,7 @@ class Attendance(models.Model):
 
 
  
-class Patient(models.Model):
-    
+class Patient(models.Model):    
     patient_id = models.PositiveIntegerField(unique=True, editable=False, null=True, blank=True)
     name = models.CharField(max_length=255, null=True, blank=True)
     age = models.IntegerField(null=True, blank=True)
