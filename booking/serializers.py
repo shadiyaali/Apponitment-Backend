@@ -21,7 +21,7 @@ class AttendanceSerializer(serializers.ModelSerializer):
 class PatientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Patient
-        fields = ['patient_id', 'name', 'age', 'gender', 'phone', 'email']
+        fields = ['id', 'patient_id', 'name', 'age', 'gender', 'phone', 'email']
 \
 
 class AppointmentSerializer(serializers.ModelSerializer):
@@ -30,7 +30,7 @@ class AppointmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Appointment
-        fields = ['token_number', 'patient', 'doctor', 'date', 'time', 'status']
+        fields = ['id','token_number', 'patient', 'doctor', 'date', 'time', 'status']
 
 
  
@@ -42,4 +42,4 @@ class AppointmentGetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Appointment
-        fields = ['token_number', 'patient', 'doctor', 'date', 'time', 'status']
+        fields = ['id','token_number', 'patient', 'doctor', 'date', 'time', 'status']

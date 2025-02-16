@@ -38,26 +38,30 @@ class Attendance(models.Model):
     
 
 
+ 
 class Patient(models.Model):
-    patient_id = models.PositiveIntegerField(unique=True, editable=False, null=True,blank =True)
-    name = models.CharField(max_length=255,null=True, blank=True)
+    # This is the custom patient identifier field, which is not the same as `id`
+    patient_id = models.PositiveIntegerField(unique=True, editable=False, null=True, blank=True)
+    name = models.CharField(max_length=255, null=True, blank=True)
     age = models.IntegerField(null=True, blank=True)
-    gender = models.CharField(max_length=10, choices=[('Male', 'Male'), ('Female', 'Female')],null=True, blank=True)
+    gender = models.CharField(max_length=10, choices=[('Male', 'Male'), ('Female', 'Female')], null=True, blank=True)
     phone = models.CharField(max_length=20, null=True, blank=True)
     email = models.EmailField(unique=True, null=True, blank=True)
 
+    # Overriding the save method to create a patient_id if not set
     def save(self, *args, **kwargs):
-   
         if not self.patient_id:
             while True:
-                new_id = random.randint(10000, 99999)  
-                if not Patient.objects.filter(patient_id=new_id).exists():   
+                new_id = random.randint(10000, 99999)
+                if not Patient.objects.filter(patient_id=new_id).exists():
                     self.patient_id = new_id
                     break
+        # Call the parent save method to save the model instance
         super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.name} - {self.patient_id}"
+
 
 
 class Appointment(models.Model):
