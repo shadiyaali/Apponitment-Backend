@@ -25,6 +25,20 @@ class AttendanceListCreate(generics.ListCreateAPIView):
     queryset = Attendance.objects.all()
     serializer_class = AttendanceSerializer
 
+    def create(self, request, *args, **kwargs):
+        # Check if an attendance record already exists for the same employee and date
+        employee = request.data.get('employee')
+        date = request.data.get('date')
+
+        if Attendance.objects.filter(employee=employee, date=date).exists():
+            # If attendance already exists, return a custom error message
+            return Response({
+                "non_field_errors": ["Attendance record for this employee already exists on this date."]
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # If no existing record is found, proceed with creating the attendance record
+        return super().create(request, *args, **kwargs)
+
 class AttendanceDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Attendance.objects.all()
     serializer_class = AttendanceSerializer
