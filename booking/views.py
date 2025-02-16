@@ -26,22 +26,39 @@ class AttendanceListCreate(generics.ListCreateAPIView):
     serializer_class = AttendanceSerializer
 
     def create(self, request, *args, **kwargs):
-        # Check if an attendance record already exists for the same employee and date
+ 
         employee = request.data.get('employee')
         date = request.data.get('date')
 
         if Attendance.objects.filter(employee=employee, date=date).exists():
-            # If attendance already exists, return a custom error message
+        
             return Response({
                 "non_field_errors": ["Attendance record for this employee already exists on this date."]
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        # If no existing record is found, proceed with creating the attendance record
+      
         return super().create(request, *args, **kwargs)
 
 class AttendanceDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Attendance.objects.all()
     serializer_class = AttendanceSerializer
+
+    def update(self, request, *args, **kwargs):
+        partial = True  # Allow partial updates
+        instance = self.get_object()
+        
+        # Ensure 'employee' and 'date' are preserved if not provided
+        data = request.data.copy()
+        data.setdefault('employee', instance.employee.id)
+        data.setdefault('date', instance.date)
+        
+        # Update with the modified data
+        serializer = self.get_serializer(instance, data=data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
+
+
 
 class PatientListCreateView(generics.ListCreateAPIView):
     queryset = Patient.objects.all()
@@ -104,34 +121,45 @@ class AppointmentListCreate(generics.ListCreateAPIView):
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
+
+
 class AppointmentDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Appointment.objects.all()
     serializer_class = AppointmentGetSerializer
 
     def perform_update(self, serializer):
+        instance = self.get_object()
         data = serializer.validated_data
         
-        
-        if data['date'] < timezone.now().date():
-            raise ValidationError("Appointment date cannot be in the past.")
-        
-        
-        if Appointment.objects.filter(doctor=data['doctor'], date=data['date'], time=data['time']).exclude(id=self.kwargs['pk']).exists():
-            raise ValidationError("The doctor is already booked at this time.")
-        
        
-        if Appointment.objects.filter(patient=data['patient'], date=data['date'], time=data['time']).exclude(id=self.kwargs['pk']).exists():
+        date = data.get('date', instance.date)
+
+      
+        time = data.get('time', instance.time)
+   
+        if date < timezone.now().date():
+            raise ValidationError("Appointment date cannot be in the past.")
+
+      
+        patient = data.get('patient', instance.patient)
+        doctor = data.get('doctor', instance.doctor)
+
+     
+        if Appointment.objects.filter(doctor=doctor, date=date, time=time).exclude(id=instance.id).exists():
+            raise ValidationError("The doctor is already booked at this time.")
+
+        if Appointment.objects.filter(patient=patient, date=date, time=time).exclude(id=instance.id).exists():
             raise ValidationError("The patient already has an appointment at this time.")
         
         
         serializer.save()
 
     def update(self, request, *args, **kwargs):
-         
         try:
             return super().update(request, *args, **kwargs)
         except ValidationError as e:
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
  

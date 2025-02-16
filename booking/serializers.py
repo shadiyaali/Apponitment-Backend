@@ -9,9 +9,14 @@ class EmployeeSerializer(serializers.ModelSerializer):
 
 
 class AttendanceSerializer(serializers.ModelSerializer):
+    employee = serializers.PrimaryKeyRelatedField(queryset=Employee.objects.all(), required=False)
+    date = serializers.DateField(required=False)
+
     class Meta:
         model = Attendance
         fields = ['id', 'employee', 'date', 'is_present']
+
+
 
 class PatientSerializer(serializers.ModelSerializer):
     class Meta:
@@ -28,16 +33,13 @@ class AppointmentSerializer(serializers.ModelSerializer):
         fields = ['token_number', 'patient', 'doctor', 'date', 'time', 'status']
 
 
-
+ 
 
 class AppointmentGetSerializer(serializers.ModelSerializer):
-    # Use the PatientSerializer for the patient field to get full patient details
-    patient = PatientSerializer()
-    
-    # Use the EmployeeSerializer for the doctor field to get full doctor details
-    doctor = EmployeeSerializer()
+   
+    patient = serializers.PrimaryKeyRelatedField(queryset=Patient.objects.all(), required=False)
+    doctor = serializers.PrimaryKeyRelatedField(queryset=Employee.objects.filter(employee_type='Doctor'), required=False)
 
     class Meta:
         model = Appointment
         fields = ['token_number', 'patient', 'doctor', 'date', 'time', 'status']
-

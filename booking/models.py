@@ -26,8 +26,8 @@ class Employee(models.Model):
 
 
 class Attendance(models.Model):
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    date = models.DateField()
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE,null=True, blank=True)
+    date = models.DateField(null=True, blank=True)
     is_present = models.BooleanField(default=True)   
    
     class Meta:
@@ -40,9 +40,9 @@ class Attendance(models.Model):
 
 class Patient(models.Model):
     patient_id = models.PositiveIntegerField(unique=True, editable=False, null=True,blank =True)
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255,null=True, blank=True)
     age = models.IntegerField(null=True, blank=True)
-    gender = models.CharField(max_length=10, choices=[('Male', 'Male'), ('Female', 'Female')])
+    gender = models.CharField(max_length=10, choices=[('Male', 'Male'), ('Female', 'Female')],null=True, blank=True)
     phone = models.CharField(max_length=20, null=True, blank=True)
     email = models.EmailField(unique=True, null=True, blank=True)
 
@@ -71,8 +71,8 @@ class Appointment(models.Model):
     ]
 
     token_number = models.PositiveIntegerField(unique=True, editable=False, null=True, blank=True)
-    patient = models.ForeignKey('Patient', on_delete=models.CASCADE)
-    doctor = models.ForeignKey('Employee', on_delete=models.CASCADE, limit_choices_to={'employee_type': 'Doctor'})
+    patient = models.ForeignKey('Patient', on_delete=models.CASCADE, null=True, blank=True)
+    doctor = models.ForeignKey('Employee', on_delete=models.CASCADE, limit_choices_to={'employee_type': 'Doctor'}, null=True, blank=True)
     date = models.DateField(null=True, blank=True)
     time = models.TimeField(null=True, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
