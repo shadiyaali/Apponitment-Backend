@@ -11,10 +11,27 @@ class PatientSerializer(serializers.ModelSerializer):
         model = Patient
         fields = '__all__'
 
+
+
 class AppointmentSerializer(serializers.ModelSerializer):
-    patient = PatientSerializer(read_only=True)  
-    doctor_name = serializers.ReadOnlyField(source='doctor.name')
+    # Use PrimaryKeyRelatedField for creating appointments
+    patient = serializers.PrimaryKeyRelatedField(queryset=Patient.objects.all())
+    doctor = serializers.PrimaryKeyRelatedField(queryset=Doctor.objects.all())
 
     class Meta:
         model = Appointment
-        fields = ['id', 'patient', 'doctor', 'doctor_name', 'token_number', 'date', 'time', 'status']
+        fields = '__all__'
+
+    def validate_patient(self, value):
+        if not value:
+            raise serializers.ValidationError("Patient cannot be null.")
+        return value
+
+class AppointmentDetailSerializer(serializers.ModelSerializer):
+    # Use nested serialization for retrieving appointments
+    patient = PatientSerializer()
+    doctor = DoctorSerializer()
+
+    class Meta:
+        model = Appointment
+        fields = '__all__'
